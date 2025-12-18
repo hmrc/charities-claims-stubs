@@ -1,7 +1,7 @@
 
 # charities-claims-stubs
 
-This is a placeholder README.md for a new repository
+Provides stubbed endpoints required for local and on-Staging testing of DASS Replatform Charities services.
 
 ### License
 
