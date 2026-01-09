@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.charitiesclaimsstubs.controllers
+package uk.gov.hmrc.charitiesclaimsstubs.models
 
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import play.api.libs.json.{Format, Json}
 
-import javax.inject.{Inject, Singleton}
+final case class UploadSummary(
+  reference: String,
+  validationType: String,
+  fileStatus: String,
+  uploadUrl: Option[String] = None
+)
 
-@Singleton()
-class MicroserviceHelloWorldController @Inject() (
-  cc: ControllerComponents
-) extends BackendController(cc):
-
-  val hello: Action[AnyContent] =
-    Action:
-      implicit request => Ok("Hello world")
+object UploadSummary:
+  given Format[UploadSummary] = Json.format[UploadSummary]
