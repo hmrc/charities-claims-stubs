@@ -1,0 +1,4 @@
+# Validation stub routes
+
+GET        /:claimId/upload-results                    uk.gov.hmrc.charitiesclaimsstubs.controllers.ClaimsStubsValidationController.getUploadSummary(claimId: String)
+DELETE     /:claimId/upload-results/:reference         uk.gov.hmrc.charitiesclaimsstubs.controllers.ClaimsStubsValidationController.deleteSchedule(claimId: String, reference: String)
