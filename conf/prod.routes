@@ -1,4 +1,5 @@
 # Add all the application routes to the app.routes file
-->         /charities-claims-stubs              app.Routes
 ->         /charities-claims-validation         validation.Routes
-->         /                          health.Routes
+->         /formp-proxy                         formpproxy.Routes
+->         /rds-datacache-proxy                 rdsdatacacheproxy.Routes
+->         /                                    health.Routes
