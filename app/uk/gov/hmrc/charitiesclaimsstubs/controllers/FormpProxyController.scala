@@ -29,6 +29,8 @@ class FormpProxyController @Inject() (
 )(using ExecutionContext)
     extends BaseController {
 
+  private val dynamicCharityRefPattern = """^charity-ref-(\d+)$""".r // example: charity-ref-5000
+
   def getTotalUnregulatedDonations(charityReference: String): Action[AnyContent] =
     Action.async { implicit request =>
       unregulatedDonationsRepository.findByCharityReference(charityReference).map {
@@ -36,7 +38,12 @@ class FormpProxyController @Inject() (
           Ok(Json.obj("unregulatedDonationsTotal" -> unregulatedDonation.totalUnregulatedDonations))
 
         case None =>
-          NotFound
+          charityReference match {
+            case dynamicCharityRefPattern(amount) =>
+              Ok(Json.obj("unregulatedDonationsTotal" -> BigDecimal(amount)))
+            case _                                =>
+              NotFound
+          }
       }
     }
 

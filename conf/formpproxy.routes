@@ -1,4 +1,4 @@
 # FormP Proxy stub routes
 
-GET  /charities/:charityReference/unregulated-donations uk.gov.hmrc.charitiesclaimsstubs.controllers.FormpProxyController.getTotalUnregulatedDonations(charityReference: String)
-POST /charities/:charityReference/unregulated-donations uk.gov.hmrc.charitiesclaimsstubs.controllers.FormpProxyController.saveUnregulatedDonation(charityReference: String)
+GET     /charities/:charityReference/unregulated-donations      uk.gov.hmrc.charitiesclaimsstubs.controllers.FormpProxyController.getTotalUnregulatedDonations(charityReference: String)
+POST    /charities/:charityReference/unregulated-donations      uk.gov.hmrc.charitiesclaimsstubs.controllers.FormpProxyController.saveUnregulatedDonation(charityReference: String)
