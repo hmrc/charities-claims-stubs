@@ -48,7 +48,7 @@ class UnregulatedDonationsRepositorySpec
     "find by charity reference should return none initially" in
       repository.findByCharityReference("1234567890").futureValue.shouldBe(None)
 
-    "update and find by charity reference shoud return the updated total unregulated donations value" in
+    "update and find by charity reference should return the updated total unregulated donations value" in
       {
         for {
           _       <- repository.updateTotalUnregulatedDonations("CHARITY_1", 100)
@@ -76,5 +76,38 @@ class UnregulatedDonationsRepositorySpec
             )
           )
         )
+  }
+
+  "seedIfAbsent" should {
+    "insert a new entry when the charity reference does not exist" in {
+      for {
+        _      <- repository.seedIfAbsent("SEED_CHARITY_1", 5000)
+        result <- repository.findByCharityReference("SEED_CHARITY_1")
+      } yield result
+    }.futureValue.shouldBe(
+      Some(UnregulatedDonation("SEED_CHARITY_1", 5000))
+    )
+
+    "not overwrite an existing entry when called again with a different amount" in {
+      // seed once, then call again — the original value should remain
+      for {
+        _      <- repository.seedIfAbsent("SEED_CHARITY_2", 3000)
+        _      <- repository.seedIfAbsent("SEED_CHARITY_2", 9999)
+        result <- repository.findByCharityReference("SEED_CHARITY_2")
+      } yield result
+    }.futureValue.shouldBe(
+      Some(UnregulatedDonation("SEED_CHARITY_2", 3000))
+    )
+
+    "allow updateTotalUnregulatedDonations to increment a seeded entry" in {
+      // seed 5000, then increment by 200 — total should be 5200
+      for {
+        _      <- repository.seedIfAbsent("SEED_CHARITY_3", 5000)
+        _      <- repository.updateTotalUnregulatedDonations("SEED_CHARITY_3", 200)
+        result <- repository.findByCharityReference("SEED_CHARITY_3")
+      } yield result
+    }.futureValue.shouldBe(
+      Some(UnregulatedDonation("SEED_CHARITY_3", 5200))
+    )
   }
 }

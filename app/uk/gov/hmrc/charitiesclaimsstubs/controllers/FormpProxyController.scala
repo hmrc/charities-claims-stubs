@@ -21,7 +21,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
 import uk.gov.hmrc.charitiesclaimsstubs.models.SaveUnregulatedDonationRequest
 import uk.gov.hmrc.charitiesclaimsstubs.repositories.UnregulatedDonationsRepository
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class FormpProxyController @Inject() (
   val controllerComponents: ControllerComponents,
@@ -33,16 +33,22 @@ class FormpProxyController @Inject() (
 
   def getTotalUnregulatedDonations(charityReference: String): Action[AnyContent] =
     Action.async { implicit request =>
-      unregulatedDonationsRepository.findByCharityReference(charityReference).map {
+      unregulatedDonationsRepository.findByCharityReference(charityReference).flatMap {
         case Some(unregulatedDonation) =>
-          Ok(Json.obj("unregulatedDonationsTotal" -> unregulatedDonation.totalUnregulatedDonations))
+          // if found in MongoDB — we return the stored total
+          Future.successful(Ok(Json.obj("unregulatedDonationsTotal" -> unregulatedDonation.totalUnregulatedDonations)))
 
         case None =>
           charityReference match {
             case dynamicCharityRefPattern(amount) =>
-              Ok(Json.obj("unregulatedDonationsTotal" -> BigDecimal(amount)))
+              // seed the dynamic value into MongoDB, then return it
+              val seedAmount = BigDecimal(amount)
+              unregulatedDonationsRepository.seedIfAbsent(charityReference, seedAmount).map { _ =>
+                Ok(Json.obj("unregulatedDonationsTotal" -> seedAmount))
+              }
             case _                                =>
-              NotFound
+              // no match in DB and not a dynamic pattern — not found
+              Future.successful(NotFound)
           }
       }
     }

@@ -27,7 +27,7 @@ import java.util.UUID
 
 class FormpProxyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  val charityReference = UUID.randomUUID().toString
+  val charityReference: String = UUID.randomUUID().toString
 
   "FormpProxyController" should {
 
