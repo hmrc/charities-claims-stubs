@@ -1,4 +1,4 @@
 # RDS Datacache Proxy stub routes
 
-GET /charities/agents/:agentRef          uk.gov.hmrc.charitiesclaimsstubs.controllers.RdsDatacacheProxyController.getAgentName(agentRef: String)
-GET /charities/organisations/:charityRef uk.gov.hmrc.charitiesclaimsstubs.controllers.RdsDatacacheProxyController.getOrganisationName(charityRef: String)
+GET     /charities/agents/:agentRef                 uk.gov.hmrc.charitiesclaimsstubs.controllers.RdsDatacacheProxyController.getAgentName(agentRef: String)
+GET     /charities/organisations/:charityRef        uk.gov.hmrc.charitiesclaimsstubs.controllers.RdsDatacacheProxyController.getOrganisationName(charityRef: String)

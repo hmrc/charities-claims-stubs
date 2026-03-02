@@ -27,7 +27,7 @@ import java.util.UUID
 
 class FormpProxyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
 
-  val charityReference = UUID.randomUUID().toString
+  val charityReference: String = UUID.randomUUID().toString
 
   "FormpProxyController" should {
 
@@ -58,6 +58,34 @@ class FormpProxyControllerSpec extends AnyWordSpec with Matchers with GuiceOneAp
 
       "return NOT_FOUND when the charity reference is not found" in {
         val request = FakeRequest(GET, s"/formp-proxy/charities/${UUID.randomUUID().toString}/unregulated-donations")
+        val result  = route(app, request).get
+        status(result) shouldBe NOT_FOUND
+      }
+
+      "return a dynamic total when the charity reference matches charity-ref-XXXX pattern" in {
+        val request = FakeRequest(GET, "/formp-proxy/charities/charity-ref-5000/unregulated-donations")
+        val result  = route(app, request).get
+
+        status(result)    shouldBe OK
+        contentAsJson(result)
+          .as[JsObject]
+          .value("unregulatedDonationsTotal")
+          .as[BigDecimal] shouldBe 5000
+      }
+
+      "return zero when the charity reference is charity-ref-0" in {
+        val request = FakeRequest(GET, "/formp-proxy/charities/charity-ref-0/unregulated-donations")
+        val result  = route(app, request).get
+
+        status(result)    shouldBe OK
+        contentAsJson(result)
+          .as[JsObject]
+          .value("unregulatedDonationsTotal")
+          .as[BigDecimal] shouldBe 0
+      }
+
+      "return NOT_FOUND when the reference does not match the dynamic charity ref pattern when checked" in {
+        val request = FakeRequest(GET, "/formp-proxy/charities/some-other-ref-5000/unregulated-donations")
         val result  = route(app, request).get
         status(result) shouldBe NOT_FOUND
       }

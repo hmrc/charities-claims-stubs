@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.charitiesclaimsstubs.repositories
 
-import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes, Updates}
+import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes, UpdateOptions, Updates}
 import play.api.libs.json.Format
 import uk.gov.hmrc.charitiesclaimsstubs.models.UnregulatedDonation
 import uk.gov.hmrc.mongo.MongoComponent
@@ -48,9 +48,23 @@ class UnregulatedDonationsRepository @Inject() (
   def findByCharityReference(charityReference: String): Future[Option[UnregulatedDonation]] =
     collection.find(Filters.eq("charityReference", charityReference)).toFuture().map(_.headOption)
 
+  // seeds a charity-ref-XXXX entry into MongoDB only if it doesn't already exist
+  def seedIfAbsent(charityReference: String, amount: BigDecimal): Future[Unit] =
+    collection
+      .updateOne(
+        Filters.eq("charityReference", charityReference),
+        Updates.setOnInsert(
+          "totalUnregulatedDonations",
+          amount.bigDecimal
+        ),
+        UpdateOptions().upsert(true)
+      )
+      .toFuture()
+      .map(_ => ())
+
   def updateTotalUnregulatedDonations(charityReference: String, unregulatedDonation: BigDecimal): Future[Unit] =
     findByCharityReference(charityReference)
-      .map {
+      .flatMap {
         case Some(_) =>
           collection
             .updateOne(
