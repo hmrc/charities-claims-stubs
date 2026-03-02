@@ -81,33 +81,33 @@ class UnregulatedDonationsRepositorySpec
   "seedIfAbsent" should {
     "insert a new entry when the charity reference does not exist" in {
       for {
-        _      <- repository.seedIfAbsent("SEED_CHARITY_1", 5000)
-        result <- repository.findByCharityReference("SEED_CHARITY_1")
+        _      <- repository.seedIfAbsent("charity-ref-5000", 5000)
+        result <- repository.findByCharityReference("charity-ref-5000")
       } yield result
     }.futureValue.shouldBe(
-      Some(UnregulatedDonation("SEED_CHARITY_1", 5000))
+      Some(UnregulatedDonation("charity-ref-5000", 5000))
     )
 
     "not overwrite an existing entry when called again with a different amount" in {
       // seed once, then call again — the original value should remain
       for {
-        _      <- repository.seedIfAbsent("SEED_CHARITY_2", 3000)
-        _      <- repository.seedIfAbsent("SEED_CHARITY_2", 9999)
-        result <- repository.findByCharityReference("SEED_CHARITY_2")
+        _      <- repository.seedIfAbsent("charity-ref-3000", 3000)
+        _      <- repository.seedIfAbsent("charity-ref-3000", 9999)
+        result <- repository.findByCharityReference("charity-ref-3000")
       } yield result
     }.futureValue.shouldBe(
-      Some(UnregulatedDonation("SEED_CHARITY_2", 3000))
+      Some(UnregulatedDonation("charity-ref-3000", 3000))
     )
 
-    "allow updateTotalUnregulatedDonations to increment a seeded entry" in {
-      // seed 5000, then increment by 200 — total should be 5200
+    "allow updateTotalUnregulatedDonations to increment an entry (inc charity-ref-xxxx)" in {
+      // seed 7000, then increment by 200 — total should be 7200
       for {
-        _      <- repository.seedIfAbsent("SEED_CHARITY_3", 5000)
-        _      <- repository.updateTotalUnregulatedDonations("SEED_CHARITY_3", 200)
-        result <- repository.findByCharityReference("SEED_CHARITY_3")
+        _      <- repository.seedIfAbsent("charity-ref-7000", 7000)
+        _      <- repository.updateTotalUnregulatedDonations("charity-ref-7000", 200)
+        result <- repository.findByCharityReference("charity-ref-7000")
       } yield result
     }.futureValue.shouldBe(
-      Some(UnregulatedDonation("SEED_CHARITY_3", 5200))
+      Some(UnregulatedDonation("charity-ref-7000", 7200))
     )
   }
 }
